@@ -20,8 +20,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public UserEntity getById(Long id) {
-        return userRepository.getById(id);
+    public UserEntity findById(Long id) {
+        return userRepository.findById(id).get();
     }
 
     public List<UserEntity> findAll() {
@@ -32,8 +32,8 @@ public class UserService {
         return userRepository.save(fileEntity);
     }
 
-    public void update(UserEntity userEntity) {
-        userRepository.save(userEntity);
+    public UserEntity update(UserEntity userEntity) {
+        return userRepository.save(userEntity);
     }
 
     public void delete(UserEntity userEntity) {

@@ -1,10 +1,10 @@
 package springrestapidemo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Nikita Gvardeev
@@ -12,12 +12,16 @@ import java.util.Objects;
  */
 
 @Entity
-@Table(name = "files")
+@Table(name = "files", schema = "local_db")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @ToString
 @Builder
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class FileEntity {
 
     @Id
@@ -27,21 +31,4 @@ public class FileEntity {
     private String name;
 
     private String location;
-
-    @OneToMany(mappedBy = "fileEntity")
-    @ToString.Exclude
-    private List<EventEntity> eventEntities;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FileEntity fileEntity = (FileEntity) o;
-        return id.equals(fileEntity.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

@@ -1,9 +1,7 @@
 package springrestapidemo.service;
 
 import org.springframework.stereotype.Service;
-import springrestapidemo.entity.EventEntity;
 import springrestapidemo.entity.FileEntity;
-import springrestapidemo.repository.EventRepository;
 import springrestapidemo.repository.FileRepository;
 
 import java.util.List;
@@ -22,7 +20,7 @@ public class FileService {
         this.fileRepository = fileRepository;
     }
 
-    public FileEntity getById(Long id) {
+    public FileEntity findById(Long id) {
         return fileRepository.getById(id);
     }
 
@@ -34,8 +32,8 @@ public class FileService {
         return fileRepository.save(fileEntity);
     }
 
-    public void update(FileEntity fileEntity) {
-        fileRepository.save(fileEntity);
+    public FileEntity update(FileEntity fileEntity) {
+        return fileRepository.save(fileEntity);
     }
 
     public void delete(FileEntity fileEntity) {

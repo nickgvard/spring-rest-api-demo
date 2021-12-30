@@ -1,20 +1,37 @@
 package springrestapidemo.dto;
 
+import lombok.Builder;
+import lombok.Data;
 import springrestapidemo.entity.FileEntity;
 
 /**
  * @author Nikita Gvardeev
  * 28.12.2021
  */
+
+@Data
+@Builder
 public class FileDto {
 
-    private FileDto() {}
+    private Long id;
+    private String name;
+    private String location;
 
     public static FileEntity toEntity(FileDto fileDto) {
-        return null;
+        return FileEntity
+                .builder()
+                .id(fileDto.getId())
+                .name(fileDto.getName())
+                .location(fileDto.getLocation())
+                .build();
     }
 
     public static FileDto toDto(FileEntity fileEntity) {
-        return null;
+        return FileDto
+                .builder()
+                .id(fileEntity.getId())
+                .name(fileEntity.getName())
+                .location(fileEntity.getLocation())
+                .build();
     }
 }

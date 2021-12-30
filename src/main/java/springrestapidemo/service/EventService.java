@@ -20,7 +20,7 @@ public class EventService {
         this.eventRepository = eventRepository;
     }
 
-    public EventEntity getById(Long id) {
+    public EventEntity findById(Long id) {
         return eventRepository.getById(id);
     }
 
@@ -32,8 +32,8 @@ public class EventService {
         return eventRepository.save(eventEntity);
     }
 
-    public void update(EventEntity eventEntity) {
-        eventRepository.save(eventEntity);
+    public EventEntity update(EventEntity eventEntity) {
+        return eventRepository.save(eventEntity);
     }
 
     public void delete(EventEntity eventEntity) {
