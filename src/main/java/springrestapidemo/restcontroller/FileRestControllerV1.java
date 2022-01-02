@@ -54,7 +54,7 @@ public class FileRestControllerV1 {
     }
 
     @DeleteMapping("/files/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         FileEntity file = fileService.findById(id);
         fileService.delete(file);

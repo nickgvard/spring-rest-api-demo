@@ -21,7 +21,7 @@ public class EventService {
     }
 
     public EventEntity findById(Long id) {
-        return eventRepository.getById(id);
+        return eventRepository.findById(id).get();
     }
 
     public List<EventEntity> findAll() {

@@ -53,7 +53,7 @@ public class EventRestControllerV1 {
     }
 
     @DeleteMapping("/events/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         EventEntity event = eventService.findById(id);
         eventService.delete(event);

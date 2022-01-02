@@ -21,7 +21,7 @@ public class FileService {
     }
 
     public FileEntity findById(Long id) {
-        return fileRepository.getById(id);
+        return fileRepository.findById(id).get();
     }
 
     public List<FileEntity> findAll() {

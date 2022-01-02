@@ -1,5 +1,6 @@
 package springrestapidemo.restcontroller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.UserDto;
@@ -16,13 +17,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
+@AllArgsConstructor
 public class UserRestControllerV1 {
 
     private UserService userService;
-
-    public UserRestControllerV1(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/users")
     public List<UserDto> findAll() {
@@ -53,7 +51,7 @@ public class UserRestControllerV1 {
     }
 
     @DeleteMapping("/users/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         UserEntity userEntity = userService.findById(id);
         userService.delete(userEntity);
