@@ -1,5 +1,5 @@
 
-### Demo of a simple REST API application on Spring
+### Demo of a simple RESTful application on Spring
 >
 > MVC Pattern
 
