@@ -5,7 +5,5 @@ cache:
     - $HOME/.m2
 before_script:
   - echo "Start build"
-after_script:
-  - echo "Finish build"
 script:
-  - mvn clean install
+  - ./gradlew clean assemble testClasses
