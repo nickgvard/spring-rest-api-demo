@@ -46,7 +46,7 @@ public class EventRestControllerV1Test {
     private EventService eventService;
 
     @Test
-    public void findById() throws Exception {
+    public void whenFindById() throws Exception {
         EventEntity expected = eventEntity("Description1");
 
         given(eventService
@@ -64,7 +64,7 @@ public class EventRestControllerV1Test {
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void whenFindAll() throws Exception {
         List<EventEntity> expected = List
                 .of(eventEntity("Description1"), eventEntity("Description2"));
 
@@ -85,7 +85,7 @@ public class EventRestControllerV1Test {
     }
 
     @Test
-    public void save() throws Exception {
+    public void whenSave() throws Exception {
         EventEntity expected = eventEntity("Description1");
 
         given(eventService
@@ -107,7 +107,7 @@ public class EventRestControllerV1Test {
     }
 
     @Test
-    public void update() throws Exception {
+    public void whenUpdate() throws Exception {
         EventEntity persistFile = eventEntity("Description1");
         EventEntity expected = eventEntity("Description1_1");
 

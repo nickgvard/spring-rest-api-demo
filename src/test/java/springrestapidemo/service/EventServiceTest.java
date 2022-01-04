@@ -40,7 +40,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void findById() {
+    public void whenFindById() {
         EventEntity expected = eventEntity("Description1");
 
         given(eventRepository.findById(expected.getId())).willReturn(Optional.of(expected));
@@ -51,7 +51,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void findAll() {
+    public void whenFindAll() {
         List<EventEntity> expected = List
                 .of(
                         eventEntity("Description1"),
@@ -65,7 +65,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void save() {
+    public void whenSave() {
         EventEntity expected = eventEntity("Description1");
         EventEntity saved = new EventEntity(
                 null, UserEntity.builder().build(), FileEntity.builder().build(), "Description1");
@@ -79,7 +79,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void update() {
+    public void whenUpdate() {
         EventEntity expected = eventEntity("Description1");
         EventEntity updated = eventEntity("Description1");
 
@@ -91,7 +91,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void delete() {
+    public void whenDelete() {
         EventEntity deleted = eventEntity("Description2");
         eventService.delete(deleted);
 

@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import springrestapidemo.entity.UserEntity;
-import springrestapidemo.restcontroller.UserRestControllerV1;
 import springrestapidemo.service.UserService;
 
 import java.util.List;
@@ -43,7 +42,7 @@ public class UserRestControllerV1Test {
     private UserService userService;
 
     @Test
-    public void findById() throws Exception {
+    public void whenFindById() throws Exception {
         UserEntity expected = userEntity("Bob");
 
         given(userService
@@ -54,11 +53,11 @@ public class UserRestControllerV1Test {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(expected.getId()))
-                .andExpect(jsonPath("$.name").value(expected.getName()));
+                .andExpect(jsonPath("$.name").value(expected.getFirstName()));
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void whenFindAll() throws Exception {
         List<UserEntity> expected = List
                 .of(userEntity("Nick"), userEntity("Bob"));
 
@@ -70,12 +69,12 @@ public class UserRestControllerV1Test {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is(expected.get(0).getName())))
-                .andExpect(jsonPath("$[1].name", is(expected.get(1).getName())));
+                .andExpect(jsonPath("$[0].name", is(expected.get(0).getFirstName())))
+                .andExpect(jsonPath("$[1].name", is(expected.get(1).getFirstName())));
     }
 
     @Test
-    public void save() throws Exception {
+    public void whenSave() throws Exception {
         UserEntity expected = userEntity("Nick");
 
         given(userService
@@ -86,16 +85,20 @@ public class UserRestControllerV1Test {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new UserEntity(
-                                null, "Nick", null))))
+                        UserEntity
+                                .builder()
+                                .id(null)
+                                .firstName("Nick")
+                                .eventEntities(null)
+                                .build())))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name", is(expected.getName())))
+                .andExpect(jsonPath("$.name", is(expected.getFirstName())))
                 .andExpect(status().isCreated());
     }
 
     @Test
-    public void update() throws Exception {
+    public void whenUpdate() throws Exception {
         UserEntity persistUser = userEntity("Bob");
         UserEntity expected = userEntity("Nick");
 
@@ -111,11 +114,15 @@ public class UserRestControllerV1Test {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(
-                        new UserEntity(
-                                persistUser.getId(), "Nick", null))))
+                        UserEntity
+                                .builder()
+                                .id(persistUser.getId())
+                                .firstName("Nick")
+                                .eventEntities(null)
+                                .build())))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name", is(expected.getName())))
+                .andExpect(jsonPath("$.name", is(expected.getFirstName())))
                 .andExpect(status().isOk());
     }
 
@@ -130,6 +137,6 @@ public class UserRestControllerV1Test {
     }
 
     private UserEntity userEntity(String name) {
-        return UserEntity.builder().id(1L).name(name).build();
+        return UserEntity.builder().id(1L).firstName(name).build();
     }
 }

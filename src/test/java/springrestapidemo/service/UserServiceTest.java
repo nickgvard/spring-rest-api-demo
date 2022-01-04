@@ -39,18 +39,18 @@ public class UserServiceTest {
     }
 
     @Test
-    public void findById() {
+    public void whenFindById() {
         UserEntity expected = userEntity("Nick");
 
         given(userRepository.findById(expected.getId())).willReturn(Optional.of(expected));
 
         UserEntity actual = userService.findById(expected.getId());
 
-        assertEquals(expected.getName(), actual.getName());
+        assertEquals(expected.getFirstName(), actual.getFirstName());
     }
 
     @Test
-    public void findAll() {
+    public void whenFindAll() {
         List<UserEntity> expected = List.of(userEntity("Nick"), userEntity("Bob"));
 
         given(userRepository.findAll()).willReturn(expected);
@@ -61,9 +61,14 @@ public class UserServiceTest {
     }
 
     @Test
-    public void save() {
+    public void whenSave() {
         UserEntity expected = userEntity("Nick");
-        UserEntity saved = new UserEntity(null, "Nick", null);
+        UserEntity saved = UserEntity
+                .builder()
+                .id(null)
+                .firstName("Nick")
+                .eventEntities(null)
+                .build();
 
         given(userRepository.save(saved))
                 .willReturn(expected);
@@ -74,7 +79,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void update() {
+    public void whenUpdate() {
         UserEntity expected = userEntity("Nick");
         UserEntity updated = userEntity("Nick");
 
@@ -86,7 +91,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void delete() {
+    public void whenDelete() {
         UserEntity deleted = userEntity("Bob");
         userService.delete(deleted);
 
@@ -97,7 +102,7 @@ public class UserServiceTest {
         return UserEntity
                 .builder()
                 .id(1L)
-                .name(name)
+                .firstName(name)
                 .build();
     }
 }

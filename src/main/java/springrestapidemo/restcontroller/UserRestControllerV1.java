@@ -2,6 +2,7 @@ package springrestapidemo.restcontroller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.UserEntity;
@@ -16,13 +17,14 @@ import java.util.stream.Collectors;
  */
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/users")
 @AllArgsConstructor
 public class UserRestControllerV1 {
 
     private UserService userService;
 
-    @GetMapping("/users")
+    @GetMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public List<UserDto> findAll() {
         return userService.findAll()
                 .stream()
@@ -30,27 +32,31 @@ public class UserRestControllerV1 {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     public UserDto findById(@PathVariable Long id) {
         return UserDto.toDto(userService.findById(id));
     }
 
-    @PostMapping("/users")
+    @PostMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto save(@RequestBody UserDto userDto) {
         UserEntity user = userService.save(UserDto.toEntity(userDto));
         return UserDto.toDto(user);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public UserDto update(@RequestBody UserDto userDto, @PathVariable Long id) {
         UserEntity user = userService.findById(id);
-        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
         return UserDto.toDto(userService.update(user));
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         UserEntity userEntity = userService.findById(id);

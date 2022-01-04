@@ -28,9 +28,27 @@ public class UserEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String email;
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    private String password;
+
+    @Enumerated(value = EnumType.STRING)
+    private Status status;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+    private List<RoleEntity> roles;
 
     @OneToMany(mappedBy = "userEntity")
     @ToString.Exclude
     private List<EventEntity> eventEntities;
+
 }

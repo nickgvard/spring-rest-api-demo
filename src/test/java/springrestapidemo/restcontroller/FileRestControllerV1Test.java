@@ -46,7 +46,7 @@ public class FileRestControllerV1Test {
     private FileService fileService;
 
     @Test
-    public void findById() throws Exception {
+    public void whenFindById() throws Exception {
         FileEntity expected = fileEntity("File1", "Location1");
 
         given(fileService
@@ -62,7 +62,7 @@ public class FileRestControllerV1Test {
     }
 
     @Test
-    public void findAll() throws Exception {
+    public void whenFindAll() throws Exception {
         List<FileEntity> expected = List
                 .of(fileEntity("File1", "Location1"), fileEntity("File2", "Location2"));
 
@@ -81,7 +81,7 @@ public class FileRestControllerV1Test {
     }
 
     @Test
-    public void save() throws Exception {
+    public void whenSave() throws Exception {
         FileEntity expected = fileEntity("File1", "Location1");
 
         given(fileService
@@ -102,7 +102,7 @@ public class FileRestControllerV1Test {
     }
 
     @Test
-    public void update() throws Exception {
+    public void whenUpdate() throws Exception {
         FileEntity persistFile = fileEntity("File1", "Location1");
         FileEntity expected = fileEntity("File1_1", "Location1_1");
 

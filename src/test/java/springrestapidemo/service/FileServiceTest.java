@@ -38,7 +38,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void findById() {
+    public void whenFindById() {
         FileEntity expected = fileEntity("File1", "Location1");
 
         given(fileRepository.findById(expected.getId())).willReturn(Optional.of(expected));
@@ -49,7 +49,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void findAll() {
+    public void whenFindAll() {
         List<FileEntity> expected = List
                 .of(
                         fileEntity("File1", "Location1"),
@@ -63,7 +63,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void save() {
+    public void whenSave() {
         FileEntity expected = fileEntity("File1", "Location1");
         FileEntity saved = new FileEntity(null, "File1", "Location1");
 
@@ -76,7 +76,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void update() {
+    public void whenUpdate() {
         FileEntity expected = fileEntity("File1", "Location1");
         FileEntity updated = fileEntity("File1", "Location1");
 
@@ -88,7 +88,7 @@ public class FileServiceTest {
     }
 
     @Test
-    public void delete() {
+    public void whenDelete() {
         FileEntity deleted = fileEntity("File2", "Location2");
         fileService.delete(deleted);
 

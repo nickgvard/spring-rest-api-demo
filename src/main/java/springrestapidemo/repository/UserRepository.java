@@ -9,4 +9,6 @@ import springrestapidemo.entity.UserEntity;
  * 28.12.2021
  */
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity, Long> { }
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    UserEntity findByEmail(String email);
+}

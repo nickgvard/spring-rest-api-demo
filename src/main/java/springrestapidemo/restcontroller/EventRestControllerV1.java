@@ -1,6 +1,7 @@
 package springrestapidemo.restcontroller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.EventDto;
 import springrestapidemo.entity.EventEntity;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
  */
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/events")
 public class EventRestControllerV1 {
 
     private EventService eventService;
@@ -24,7 +25,8 @@ public class EventRestControllerV1 {
         this.eventService = eventService;
     }
 
-    @GetMapping("/events")
+    @GetMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER')")
     public List<EventDto> findAll() {
         return eventService.findAll()
                 .stream()
@@ -32,19 +34,22 @@ public class EventRestControllerV1 {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/events/{id}")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER')")
     public EventDto findById(@PathVariable Long id) {
         return EventDto.toDto(eventService.findById(id));
     }
 
-    @PostMapping("/events")
+    @PostMapping()
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     @ResponseStatus(HttpStatus.CREATED)
     public EventDto save(@RequestBody EventDto eventDto) {
         EventEntity event = eventService.save(EventDto.toEntity(eventDto));
         return EventDto.toDto(event);
     }
 
-    @PutMapping("/events/{id}")
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     @ResponseStatus(HttpStatus.OK)
     public EventDto update(@RequestBody EventDto eventDto, @PathVariable Long id) {
         EventEntity event = eventService.findById(id);
@@ -52,7 +57,8 @@ public class EventRestControllerV1 {
         return EventDto.toDto(eventService.update(event));
     }
 
-    @DeleteMapping("/events/{id}")
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         EventEntity event = eventService.findById(id);

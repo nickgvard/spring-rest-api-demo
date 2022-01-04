@@ -2,6 +2,7 @@ package springrestapidemo.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import springrestapidemo.entity.Status;
 import springrestapidemo.entity.UserEntity;
 
 import java.util.List;
@@ -17,14 +18,28 @@ import java.util.stream.Collectors;
 public class UserDto {
 
     private Long id;
-    private String name;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String password;
+    private Status status;
+    private List<RoleDto> roles;
     private List<EventDto> events;
 
     public static UserEntity toEntity(UserDto userDto) {
         return UserEntity
                 .builder()
                 .id(userDto.getId())
-                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .firstName(userDto.getFirstName())
+                .lastName(userDto.getLastName())
+                .password(userDto.getPassword())
+                .status(userDto.getStatus())
+                .roles(null == userDto.getRoles() ? null : userDto
+                        .getRoles()
+                        .stream()
+                        .map(RoleDto::toEntity)
+                        .collect(Collectors.toList()))
                 .eventEntities(null == userDto.getEvents() ? null : userDto
                         .getEvents()
                         .stream()
@@ -37,7 +52,16 @@ public class UserDto {
         return UserDto
                 .builder()
                 .id(userEntity.getId())
-                .name(userEntity.getName())
+                .email(userEntity.getEmail())
+                .firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName())
+                .password(userEntity.getPassword())
+                .status(userEntity.getStatus())
+                .roles(null == userEntity.getRoles() ? null : userEntity
+                        .getRoles()
+                        .stream()
+                        .map(RoleDto::toDto)
+                        .collect(Collectors.toList()))
                 .events(null == userEntity.getEventEntities() ? null : userEntity
                         .getEventEntities()
                         .stream()
