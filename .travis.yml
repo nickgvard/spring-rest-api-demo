@@ -1,10 +1,11 @@
 language: java
+sudo: false
 install: skip
 
 before_script:
   - echo "Start build"
 script:
-  - ./gradlew clean assemble testClasses
+  - ./gradlew build --scan -s
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

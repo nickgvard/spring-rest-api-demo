@@ -3,7 +3,6 @@ package springrestapidemo.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import springrestapidemo.entity.UserEntity;
-import springrestapidemo.repository.RoleRepository;
 import springrestapidemo.repository.UserRepository;
 
 import java.util.List;
@@ -18,7 +17,6 @@ import java.util.List;
 public class UserService {
 
     private UserRepository userRepository;
-    private RoleRepository roleRepository;
 
     public UserEntity findById(Long id) {
         return userRepository.findById(id).get();

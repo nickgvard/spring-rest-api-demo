@@ -2,6 +2,7 @@ package springrestapidemo.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 import springrestapidemo.entity.FileEntity;
 
 /**
@@ -23,6 +24,13 @@ public class FileDto {
                 .id(fileDto.getId())
                 .name(fileDto.getName())
                 .location(fileDto.getLocation())
+                .build();
+    }
+
+    public static FileEntity toEntity(MultipartFile multipartFile) {
+        return FileEntity
+                .builder()
+                .name(multipartFile.getOriginalFilename())
                 .build();
     }
 

@@ -2,7 +2,7 @@ package springrestapidemo.restcontroller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.UserEntity;
@@ -24,7 +24,7 @@ public class UserRestControllerV1 {
     private UserService userService;
 
     @GetMapping()
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     public List<UserDto> findAll() {
         return userService.findAll()
                 .stream()
@@ -33,13 +33,13 @@ public class UserRestControllerV1 {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     public UserDto findById(@PathVariable Long id) {
         return UserDto.toDto(userService.findById(id));
     }
 
     @PostMapping()
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto save(@RequestBody UserDto userDto) {
         UserEntity user = userService.save(UserDto.toEntity(userDto));
@@ -47,7 +47,7 @@ public class UserRestControllerV1 {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.OK)
     public UserDto update(@RequestBody UserDto userDto, @PathVariable Long id) {
         UserEntity user = userService.findById(id);
@@ -56,7 +56,7 @@ public class UserRestControllerV1 {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         UserEntity userEntity = userService.findById(id);

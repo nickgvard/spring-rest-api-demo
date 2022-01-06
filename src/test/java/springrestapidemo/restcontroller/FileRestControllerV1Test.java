@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import springrestapidemo.entity.FileEntity;
-import springrestapidemo.entity.FileEntity;
 import springrestapidemo.service.FileService;
+import springrestapidemo.service.amazon.AmazonS3FileService;
 
 import java.util.List;
 
@@ -22,7 +26,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +36,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(FileRestControllerV1.class)
+@WebMvcTest(value = FileRestControllerV1.class,
+        useDefaultFilters = false,
+        includeFilters = {
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        value = FileRestControllerV1.class)})
+@AutoConfigureMockMvc(addFilters = false)
 public class FileRestControllerV1Test {
 
     @Autowired
@@ -44,6 +53,12 @@ public class FileRestControllerV1Test {
 
     @MockBean
     private FileService fileService;
+
+    @MockBean
+    private AmazonS3FileService s3FileService;
+
+    @MockBean
+    private MockMultipartFile mockMultipartFile;
 
     @Test
     public void whenFindById() throws Exception {
@@ -88,17 +103,18 @@ public class FileRestControllerV1Test {
                 .save(any()))
                 .willReturn(expected);
 
-        mockMvc.perform(post("/api/v1/files")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(
-                        new FileEntity(
-                                null, "File1", null))))
+        given(s3FileService
+                .uploadFileToAmazon(any(), any()))
+                .willReturn(expected);
+
+        mockMvc.perform(multipart("/api/v1/files")
+                .file("file", mockMultipartFile.getBytes())
+                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name", is(expected.getName())))
                 .andExpect(jsonPath("$.location", is(expected.getLocation())))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @Test

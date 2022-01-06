@@ -24,7 +24,7 @@ import java.util.List;
  * 04.01.2022
  */
 
-@Component
+@Component()
 public class JwtTokenProvider {
 
     @Value("${jwt.token.secret}")
@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     @Value("${jwt.header}")
     private String authorizationHeader;
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;

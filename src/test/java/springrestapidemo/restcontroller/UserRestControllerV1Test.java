@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,12 +19,14 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author Nikita Gvardeev
@@ -29,7 +34,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(UserRestControllerV1.class)
+@WebMvcTest(value = UserRestControllerV1.class,
+        useDefaultFilters = false,
+        includeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                value = UserRestControllerV1.class)})
+@AutoConfigureMockMvc(addFilters = false)
 public class UserRestControllerV1Test {
 
     @Autowired
@@ -43,7 +54,7 @@ public class UserRestControllerV1Test {
 
     @Test
     public void whenFindById() throws Exception {
-        UserEntity expected = userEntity("Bob");
+        UserEntity expected = userEntity("bob@email.com");
 
         given(userService
                 .findById(anyLong()))
@@ -51,15 +62,16 @@ public class UserRestControllerV1Test {
 
         mockMvc.perform(get("/api/v1/users/{id}", expected.getId())
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$.id").value(expected.getId()))
-                .andExpect(jsonPath("$.name").value(expected.getFirstName()));
+                .andExpect(jsonPath("$.email").value(expected.getEmail()))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void whenFindAll() throws Exception {
         List<UserEntity> expected = List
-                .of(userEntity("Nick"), userEntity("Bob"));
+                .of(userEntity("nick@email.com"), userEntity("bob@email.com"));
 
         given(userService
                 .findAll())
@@ -68,14 +80,15 @@ public class UserRestControllerV1Test {
         mockMvc.perform(get("/api/v1/users")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is(expected.get(0).getFirstName())))
-                .andExpect(jsonPath("$[1].name", is(expected.get(1).getFirstName())));
+                .andExpect(jsonPath("$[0].email", is(expected.get(0).getEmail())))
+                .andExpect(jsonPath("$[1].email", is(expected.get(1).getEmail())));
     }
 
     @Test
     public void whenSave() throws Exception {
-        UserEntity expected = userEntity("Nick");
+        UserEntity expected = userEntity("nick@email.com");
 
         given(userService
                 .save(any()))
@@ -88,19 +101,19 @@ public class UserRestControllerV1Test {
                         UserEntity
                                 .builder()
                                 .id(null)
-                                .firstName("Nick")
+                                .email("nick@email.com")
                                 .eventEntities(null)
                                 .build())))
                 .andDo(print())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name", is(expected.getFirstName())))
+                .andExpect(jsonPath("$.id").value(expected.getId()))
+                .andExpect(jsonPath("$.email", is(expected.getEmail())))
                 .andExpect(status().isCreated());
     }
 
     @Test
     public void whenUpdate() throws Exception {
-        UserEntity persistUser = userEntity("Bob");
-        UserEntity expected = userEntity("Nick");
+        UserEntity persistUser = userEntity("bob@email.com");
+        UserEntity expected = userEntity("nick@email.com");
 
         given(userService
                 .findById(persistUser.getId()))
@@ -117,18 +130,18 @@ public class UserRestControllerV1Test {
                         UserEntity
                                 .builder()
                                 .id(persistUser.getId())
-                                .firstName("Nick")
+                                .email("nick@email.com")
                                 .eventEntities(null)
                                 .build())))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.name", is(expected.getFirstName())))
+                .andExpect(jsonPath("$.email", is(expected.getEmail())))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void whenDelete() throws Exception {
-        UserEntity persistUser = userEntity("Nick");
+        UserEntity persistUser = userEntity("nick@email.com");
 
         doNothing().when(userService).delete(persistUser);
 
@@ -136,7 +149,7 @@ public class UserRestControllerV1Test {
                 .andExpect(status().isAccepted());
     }
 
-    private UserEntity userEntity(String name) {
-        return UserEntity.builder().id(1L).firstName(name).build();
+    private UserEntity userEntity(String email) {
+        return UserEntity.builder().id(1L).email(email).build();
     }
 }

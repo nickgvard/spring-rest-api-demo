@@ -1,7 +1,7 @@
 package springrestapidemo.restcontroller;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.EventDto;
 import springrestapidemo.entity.EventEntity;
@@ -26,7 +26,7 @@ public class EventRestControllerV1 {
     }
 
     @GetMapping()
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"})
     public List<EventDto> findAll() {
         return eventService.findAll()
                 .stream()
@@ -35,13 +35,13 @@ public class EventRestControllerV1 {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR', 'ROLE_USER')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"})
     public EventDto findById(@PathVariable Long id) {
         return EventDto.toDto(eventService.findById(id));
     }
 
     @PostMapping()
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     @ResponseStatus(HttpStatus.CREATED)
     public EventDto save(@RequestBody EventDto eventDto) {
         EventEntity event = eventService.save(EventDto.toEntity(eventDto));
@@ -49,7 +49,7 @@ public class EventRestControllerV1 {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     @ResponseStatus(HttpStatus.OK)
     public EventDto update(@RequestBody EventDto eventDto, @PathVariable Long id) {
         EventEntity event = eventService.findById(id);
@@ -58,7 +58,7 @@ public class EventRestControllerV1 {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MODERATOR')")
+    @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
         EventEntity event = eventService.findById(id);
