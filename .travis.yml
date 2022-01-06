@@ -1,16 +1,11 @@
 language: java
-sudo: false
-install: skip
+
+cache:
+  directories:
+    - $HOME/.gradle
 
 before_script:
   - echo "Start build"
+
 script:
   - ./gradlew build --scan -s
-
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
