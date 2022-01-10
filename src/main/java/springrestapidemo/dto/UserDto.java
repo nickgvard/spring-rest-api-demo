@@ -6,6 +6,7 @@ import springrestapidemo.entity.Status;
 import springrestapidemo.entity.UserEntity;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -35,12 +36,12 @@ public class UserDto {
                 .lastName(userDto.getLastName())
                 .password(userDto.getPassword())
                 .status(userDto.getStatus())
-                .roles(null == userDto.getRoles() ? null : userDto
+                .roles(Objects.isNull(userDto.getRoles()) ? null : userDto
                         .getRoles()
                         .stream()
                         .map(RoleDto::toEntity)
                         .collect(Collectors.toList()))
-                .eventEntities(null == userDto.getEvents() ? null : userDto
+                .eventEntities(Objects.isNull(userDto.getEvents()) ? null : userDto
                         .getEvents()
                         .stream()
                         .map(EventDto::toEntity)
@@ -57,12 +58,12 @@ public class UserDto {
                 .lastName(userEntity.getLastName())
                 .password(userEntity.getPassword())
                 .status(userEntity.getStatus())
-                .roles(null == userEntity.getRoles() ? null : userEntity
+                .roles(Objects.isNull(userEntity.getRoles()) ? null : userEntity
                         .getRoles()
                         .stream()
                         .map(RoleDto::toDto)
                         .collect(Collectors.toList()))
-                .events(null == userEntity.getEventEntities() ? null : userEntity
+                .events(Objects.isNull(userEntity.getEventEntities()) ? null : userEntity
                         .getEventEntities()
                         .stream()
                         .map(EventDto::toDto)

@@ -14,8 +14,7 @@ import javax.persistence.*;
 @Table(name = "events", schema = "local_db")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @ToString
 @Builder
 @JsonIdentityInfo(

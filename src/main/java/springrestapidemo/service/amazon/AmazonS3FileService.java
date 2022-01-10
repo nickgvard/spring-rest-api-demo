@@ -1,11 +1,13 @@
 package springrestapidemo.service.amazon;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import springrestapidemo.config.AmazonConfig;
 import springrestapidemo.entity.FileEntity;
-import springrestapidemo.service.amazon.util.AmazonClientService;
 import springrestapidemo.util.FileUtils;
 
 import java.io.File;
@@ -17,7 +19,11 @@ import java.io.IOException;
  */
 
 @Service
-public class AmazonS3FileService extends AmazonClientService {
+@RequiredArgsConstructor
+public class AmazonS3FileService {
+
+    private final AmazonConfig amazonConfig;
+    private final AmazonS3 amazonS3;
 
     private String location;
 
@@ -33,7 +39,8 @@ public class AmazonS3FileService extends AmazonClientService {
                 .getLocation()
                 .substring(fileEntity.getLocation().lastIndexOf("/") + 1);
 
-        getClient().deleteObject(new DeleteObjectRequest(getBucketName(), fileName));
+//        getClient().deleteObject(new DeleteObjectRequest(getBucketName(), fileName));
+        amazonS3.deleteObject(new DeleteObjectRequest(amazonConfig.getBucketName(), fileName));
     }
 
     private void uploadMultipartFile(MultipartFile multipartFile) {
@@ -45,16 +52,18 @@ public class AmazonS3FileService extends AmazonClientService {
 
             file.delete();
 
-            location = getUrl().concat(fileName);
+            location = amazonConfig.getUrl().concat(fileName);
         }catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private void uploadFile(String fileName, File file) {
-        getClient()
+//        getClient()
+//                .putObject(
+//                        new PutObjectRequest(getBucketName(), fileName, file));
+        amazonS3
                 .putObject(
-                        new PutObjectRequest(getBucketName(), fileName, file));
-//                                .withCannedAcl(CannedAccessControlList.PublicRead));
+                        new PutObjectRequest(amazonConfig.getBucketName(), fileName, file));
     }
 }

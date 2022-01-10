@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import springrestapidemo.entity.RoleEntity;
+import springrestapidemo.dto.RoleDto;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +52,7 @@ public class JwtTokenProvider {
         return new BCryptPasswordEncoder();
     }
 
-    public String token(String email, List<RoleEntity> roles) {
+    public String token(String email, List<RoleDto> roles) {
         Claims claims = Jwts.claims().setSubject(email);
 
         claims.put("roles", roleNames(roles));
@@ -91,7 +91,7 @@ public class JwtTokenProvider {
         return request.getHeader(authorizationHeader);
     }
 
-    private List<String> roleNames(List<RoleEntity> userRoles) {
+    private List<String> roleNames(List<RoleDto> userRoles) {
         List<String> result = new ArrayList<>();
 
         userRoles.forEach(role -> {

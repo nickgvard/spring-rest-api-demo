@@ -1,12 +1,15 @@
 package springrestapidemo.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import springrestapidemo.entity.UserEntity;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.security.jwt.JwtUserFactory;
 import springrestapidemo.service.UserService;
+
+import java.util.Objects;
 
 /**
  * @author Nikita Gvardeev
@@ -14,21 +17,18 @@ import springrestapidemo.service.UserService;
  */
 
 @Service("userDetailsServiceImpl")
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;
 
-    public UserDetailsServiceImpl(UserService userService) {
-        this.userService = userService;
-    }
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEntity userEntity = userService.findByEmail(email);
+        UserDto userDto = userService.findByEmail(email);
 
-        if (userEntity == null)
+        if (Objects.isNull(userDto))
             throw new UsernameNotFoundException("User with email: " + email + " not found");
 
-        return JwtUserFactory.jwtUser(userEntity);
+        return JwtUserFactory.jwtUser(userDto);
     }
 }

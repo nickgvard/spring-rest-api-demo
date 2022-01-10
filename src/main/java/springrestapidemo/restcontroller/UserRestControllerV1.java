@@ -1,15 +1,14 @@
 package springrestapidemo.restcontroller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.UserDto;
-import springrestapidemo.entity.UserEntity;
 import springrestapidemo.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Nikita Gvardeev
@@ -18,48 +17,41 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserRestControllerV1 {
 
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping()
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
-    public List<UserDto> findAll() {
-        return userService.findAll()
-                .stream()
-                .map(UserDto::toDto)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<UserDto>> findAll() {
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
-    public UserDto findById(@PathVariable Long id) {
-        return UserDto.toDto(userService.findById(id));
+    public ResponseEntity<UserDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
     @PostMapping()
     @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto save(@RequestBody UserDto userDto) {
-        UserEntity user = userService.save(UserDto.toEntity(userDto));
-        return UserDto.toDto(user);
+    public ResponseEntity<UserDto> save(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(userService.save(userDto));
     }
 
     @PutMapping("/{id}")
     @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.OK)
-    public UserDto update(@RequestBody UserDto userDto, @PathVariable Long id) {
-        UserEntity user = userService.findById(id);
-        user.setEmail(userDto.getEmail());
-        return UserDto.toDto(userService.update(user));
+    public ResponseEntity<UserDto> update(@RequestBody UserDto userDto, @PathVariable Long id) {
+        return ResponseEntity.ok(userService.update(userDto, id));
     }
 
     @DeleteMapping("/{id}")
     @Secured({"ROLE_ADMIN"})
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
-        UserEntity userEntity = userService.findById(id);
-        userService.delete(userEntity);
+        userService.delete(id);
     }
 }

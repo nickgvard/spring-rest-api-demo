@@ -16,8 +16,7 @@ import java.util.List;
 @Table(name = "roles")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @ToString
 @Builder
 @JsonIdentityInfo(

@@ -1,10 +1,16 @@
 package springrestapidemo.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import springrestapidemo.dto.FileDto;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.repository.FileRepository;
+import springrestapidemo.service.amazon.AmazonS3FileService;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikita Gvardeev
@@ -12,31 +18,57 @@ import java.util.List;
  */
 
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
+    private final AmazonS3FileService s3FileService;
 
-    public FileService(FileRepository fileRepository) {
-        this.fileRepository = fileRepository;
+    public FileDto findById(Long id) {
+        FileEntity fileEntity = fileRepository.findById(id).orElse(null);
+
+        if (Objects.isNull(fileEntity))
+            throw new RuntimeException("File by id: " + id + " not found");
+
+        return FileDto.toDto(fileEntity);
     }
 
-    public FileEntity findById(Long id) {
-        return fileRepository.findById(id).get();
+    public List<FileDto> findAll() {
+        return fileRepository.findAll()
+                .stream()
+                .map(FileDto::toDto)
+                .collect(Collectors.toList());
     }
 
-    public List<FileEntity> findAll() {
-        return fileRepository.findAll();
+    public FileDto save(MultipartFile multipartFile) {
+        FileEntity uploadFile = FileDto.toEntity(multipartFile);
+
+        uploadFile = s3FileService.uploadFileToAmazon(uploadFile, multipartFile);
+
+        FileEntity fileEntity = fileRepository.save(uploadFile);
+
+        return FileDto.toDto(fileRepository.save(fileEntity));
     }
 
-    public FileEntity save(FileEntity fileEntity) {
-        return fileRepository.save(fileEntity);
+    public FileDto update(FileDto fileDto, Long id) {
+        FileEntity fileEntity = fileRepository.findById(id).orElse(null);
+
+        if (Objects.isNull(fileEntity))
+            throw new RuntimeException("File by id: " + id + " not found");
+
+        fileEntity.setName(fileDto.getName());
+        fileEntity.setLocation(fileDto.getLocation());
+
+        return FileDto.toDto(fileRepository.save(fileEntity));
     }
 
-    public FileEntity update(FileEntity fileEntity) {
-        return fileRepository.save(fileEntity);
-    }
+    public void delete(Long id) {
+        FileEntity fileEntity = fileRepository.findById(id).orElse(null);
 
-    public void delete(FileEntity fileEntity) {
+        if (Objects.isNull(fileEntity))
+            throw new RuntimeException("File by id: " + id + " not found");
+
+        s3FileService.removeFileFromAmazon(fileEntity);
         fileRepository.delete(fileEntity);
     }
 }

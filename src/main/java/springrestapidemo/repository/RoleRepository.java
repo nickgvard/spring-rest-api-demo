@@ -8,5 +8,4 @@ import springrestapidemo.entity.RoleEntity;
  * 04.01.2022
  */
 public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
-    RoleEntity findByName(String name);
 }

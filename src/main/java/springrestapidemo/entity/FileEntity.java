@@ -15,8 +15,7 @@ import javax.persistence.*;
 @Table(name = "files", schema = "local_db")
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @ToString
 @Builder
 @JsonIdentityInfo(

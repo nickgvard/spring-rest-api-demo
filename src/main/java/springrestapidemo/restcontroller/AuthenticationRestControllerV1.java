@@ -1,6 +1,6 @@
 package springrestapidemo.restcontroller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springrestapidemo.dto.AuthenticationRequestDto;
-import springrestapidemo.entity.UserEntity;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.security.jwt.JwtTokenProvider;
 import springrestapidemo.service.UserService;
 
@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author Nikita Gvardeev
@@ -29,12 +30,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthenticationRestControllerV1 {
 
-    private AuthenticationManager authenticationManager;
-    private JwtTokenProvider jwtTokenProvider;
-    private UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthenticationRequestDto requestDto) {
@@ -42,12 +43,12 @@ public class AuthenticationRestControllerV1 {
             String email = requestDto.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, requestDto.getPassword()));
 
-            UserEntity userEntity = userService.findByEmail(email);
+            UserDto userDto = userService.findByEmail(email);
 
-            if(userEntity == null)
+            if(Objects.isNull(userDto))
                 throw new UsernameNotFoundException("User with email: " + email + " not found");
 
-            String token = jwtTokenProvider.token(email, userEntity.getRoles());
+            String token = jwtTokenProvider.token(email, userDto.getRoles());
 
             Map<Object, Object> response = new HashMap<>();
 

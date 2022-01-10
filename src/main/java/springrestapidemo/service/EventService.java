@@ -1,10 +1,15 @@
 package springrestapidemo.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import springrestapidemo.dto.EventDto;
 import springrestapidemo.entity.EventEntity;
 import springrestapidemo.repository.EventRepository;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Nikita Gvardeev
@@ -12,31 +17,50 @@ import java.util.List;
  */
 
 @Service
+@RequiredArgsConstructor
 public class EventService {
 
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
 
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    public EventDto findById(Long id) {
+        EventEntity eventEntity = eventRepository.findById(id).orElse(null);
+
+        if (Objects.isNull(eventEntity))
+            throw new RuntimeException("Event by id: " + id + " not found");
+
+        return EventDto.toDto(eventEntity);
     }
 
-    public EventEntity findById(Long id) {
-        return eventRepository.findById(id).get();
+    public List<EventDto> findAll() {
+        return eventRepository.findAll()
+                .stream()
+                .map(EventDto::toDto)
+                .collect(Collectors.toList());
     }
 
-    public List<EventEntity> findAll() {
-        return eventRepository.findAll();
+    public EventDto save(EventDto eventDto) {
+        return EventDto
+                .toDto(eventRepository
+                        .save(EventDto
+                                .toEntity(eventDto)));
     }
 
-    public EventEntity save(EventEntity eventEntity) {
-        return eventRepository.save(eventEntity);
+    public EventDto update(EventDto eventDto, Long id) {
+        EventEntity eventEntity = eventRepository.findById(id).orElse(null);
+
+        if (Objects.isNull(eventEntity))
+            throw new RuntimeException("Event by id: " + id + " not found");
+
+        eventEntity.setDescription(eventDto.getDescription());
+        return EventDto.toDto(eventRepository.save(eventEntity));
     }
 
-    public EventEntity update(EventEntity eventEntity) {
-        return eventRepository.save(eventEntity);
-    }
+    public void delete(Long id) {
+        EventEntity eventEntity = eventRepository.findById(id).orElse(null);
 
-    public void delete(EventEntity eventEntity) {
+        if (Objects.isNull(eventEntity))
+            throw new RuntimeException("Event by id: " + id + " not found");
+
         eventRepository.delete(eventEntity);
     }
 }

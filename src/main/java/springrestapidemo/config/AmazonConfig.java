@@ -1,6 +1,5 @@
-package springrestapidemo.service.amazon.util;
+package springrestapidemo.config;
 
-import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
@@ -8,20 +7,17 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Nikita Gvardeev
- * 06.01.2022
+ * 10.01.2022
  */
 
-@Service
+@Configuration
 @Data
-public class AmazonClientService {
-
-    private AmazonS3 client;
+public class AmazonConfig {
 
     @Value("${amazon.s3.endpoint}")
     private String url;
@@ -35,13 +31,12 @@ public class AmazonClientService {
     @Value("${amazon.s3.secret-key}")
     private String secretKey;
 
-    @PostConstruct
-    private void init() {
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-
-        client = AmazonS3ClientBuilder.standard()
+    @Bean
+    public AmazonS3 amazonS3() {
+        return AmazonS3ClientBuilder.standard()
                 .withRegion(Regions.EU_CENTRAL_1)
-                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
                 .build();
+
     }
 }

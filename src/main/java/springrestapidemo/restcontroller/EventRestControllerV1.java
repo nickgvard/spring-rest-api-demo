@@ -1,14 +1,14 @@
 package springrestapidemo.restcontroller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import springrestapidemo.dto.EventDto;
-import springrestapidemo.entity.EventEntity;
 import springrestapidemo.service.EventService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Nikita Gvardeev
@@ -17,51 +17,40 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/events")
+@RequiredArgsConstructor
 public class EventRestControllerV1 {
 
-    private EventService eventService;
-
-    public EventRestControllerV1(EventService eventService) {
-        this.eventService = eventService;
-    }
+    private final EventService eventService;
 
     @GetMapping()
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"})
-    public List<EventDto> findAll() {
-        return eventService.findAll()
-                .stream()
-                .map(EventDto::toDto)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<EventDto>> findAll() {
+        return ResponseEntity.ok(
+                eventService.findAll());
     }
 
     @GetMapping("/{id}")
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR", "ROLE_USER"})
-    public EventDto findById(@PathVariable Long id) {
-        return EventDto.toDto(eventService.findById(id));
+    public ResponseEntity<EventDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.findById(id));
     }
 
     @PostMapping()
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
-    @ResponseStatus(HttpStatus.CREATED)
-    public EventDto save(@RequestBody EventDto eventDto) {
-        EventEntity event = eventService.save(EventDto.toEntity(eventDto));
-        return EventDto.toDto(event);
+    public ResponseEntity<EventDto> save(@RequestBody EventDto eventDto) {
+        return ResponseEntity.ok(eventService.save(eventDto));
     }
 
     @PutMapping("/{id}")
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
-    @ResponseStatus(HttpStatus.OK)
-    public EventDto update(@RequestBody EventDto eventDto, @PathVariable Long id) {
-        EventEntity event = eventService.findById(id);
-        event.setDescription(eventDto.getDescription());
-        return EventDto.toDto(eventService.update(event));
+    public ResponseEntity<EventDto> update(@RequestBody EventDto eventDto, @PathVariable Long id) {
+        return ResponseEntity.ok(eventService.update(eventDto, id));
     }
 
     @DeleteMapping("/{id}")
     @Secured({"ROLE_ADMIN", "ROLE_MODERATOR"})
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void delete(@PathVariable Long id) {
-        EventEntity event = eventService.findById(id);
-        eventService.delete(event);
+        eventService.delete(id);
     }
 }

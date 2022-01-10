@@ -1,9 +1,9 @@
 package springrestapidemo.security.jwt;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import springrestapidemo.entity.RoleEntity;
+import springrestapidemo.dto.RoleDto;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.Status;
-import springrestapidemo.entity.UserEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +15,16 @@ import java.util.stream.Collectors;
  */
 public final class JwtUserFactory {
 
-    public static JwtUser jwtUser(UserEntity userEntity) {
+    public static JwtUser jwtUser(UserDto userDto) {
         return JwtUser.builder()
-                .email(userEntity.getEmail())
-                .password(userEntity.getPassword())
-                .enabled(userEntity.getStatus().equals(Status.ACTIVE))
-                .authorities(grantedAuthorities(new ArrayList<>(userEntity.getRoles())))
+                .email(userDto.getEmail())
+                .password(userDto.getPassword())
+                .enabled(userDto.getStatus().equals(Status.ACTIVE))
+                .authorities(grantedAuthorities(new ArrayList<>(userDto.getRoles())))
                 .build();
     }
 
-    public static List<SimpleGrantedAuthority> grantedAuthorities(List<RoleEntity> roles) {
+    public static List<SimpleGrantedAuthority> grantedAuthorities(List<RoleDto> roles) {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());

@@ -16,8 +16,7 @@ import java.util.List;
 @Table(name = "users", schema = "local_db")
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
 @JsonIdentityInfo(
         generator = ObjectIdGenerators.PropertyGenerator.class,
