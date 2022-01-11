@@ -41,11 +41,11 @@ public class FileService {
     }
 
     public FileDto save(MultipartFile multipartFile) {
-        FileEntity uploadFile = FileDto.toEntity(multipartFile);
+        FileDto uploadFile = FileDto.toDto(multipartFile);
 
         uploadFile = s3FileService.uploadFileToAmazon(uploadFile, multipartFile);
 
-        FileEntity fileEntity = fileRepository.save(uploadFile);
+        FileEntity fileEntity = fileRepository.save(FileDto.toEntity(uploadFile));
 
         return FileDto.toDto(fileRepository.save(fileEntity));
     }
@@ -68,7 +68,7 @@ public class FileService {
         if (Objects.isNull(fileEntity))
             throw new RuntimeException("File by id: " + id + " not found");
 
-        s3FileService.removeFileFromAmazon(fileEntity);
+        s3FileService.removeFileFromAmazon(FileDto.toDto(fileEntity));
         fileRepository.delete(fileEntity);
     }
 }

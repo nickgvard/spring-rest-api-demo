@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import springrestapidemo.config.AmazonConfig;
-import springrestapidemo.entity.FileEntity;
+import springrestapidemo.dto.FileDto;
 import springrestapidemo.util.FileUtils;
 
 import java.io.File;
@@ -27,19 +27,17 @@ public class AmazonS3FileService {
 
     private String location;
 
-    public FileEntity uploadFileToAmazon(FileEntity fileEntity, MultipartFile multipartFile) {
+    public FileDto uploadFileToAmazon(FileDto fileDto, MultipartFile multipartFile) {
         uploadMultipartFile(multipartFile);
 
-        fileEntity.setLocation(location);
-        return fileEntity;
+        fileDto.setLocation(location);
+        return fileDto;
     }
 
-    public void removeFileFromAmazon(FileEntity fileEntity) {
-        String fileName = fileEntity
+    public void removeFileFromAmazon(FileDto fileDto) {
+        String fileName = fileDto
                 .getLocation()
-                .substring(fileEntity.getLocation().lastIndexOf("/") + 1);
-
-//        getClient().deleteObject(new DeleteObjectRequest(getBucketName(), fileName));
+                .substring(fileDto.getLocation().lastIndexOf("/") + 1);
         amazonS3.deleteObject(new DeleteObjectRequest(amazonConfig.getBucketName(), fileName));
     }
 
@@ -59,9 +57,6 @@ public class AmazonS3FileService {
     }
 
     private void uploadFile(String fileName, File file) {
-//        getClient()
-//                .putObject(
-//                        new PutObjectRequest(getBucketName(), fileName, file));
         amazonS3
                 .putObject(
                         new PutObjectRequest(amazonConfig.getBucketName(), fileName, file));

@@ -1,6 +1,7 @@
 package springrestapidemo.security.jwt;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Data
+@Builder
 public class JwtUser implements UserDetails {
 
     private final String email;

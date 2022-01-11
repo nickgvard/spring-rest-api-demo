@@ -24,8 +24,8 @@ public class UserDto {
     private String lastName;
     private String password;
     private Status status;
-    private List<RoleDto> roles;
-    private List<EventDto> events;
+    private List<RoleDto> rolesDto;
+    private List<EventDto> eventsDto;
 
     public static UserEntity toEntity(UserDto userDto) {
         return UserEntity
@@ -36,13 +36,13 @@ public class UserDto {
                 .lastName(userDto.getLastName())
                 .password(userDto.getPassword())
                 .status(userDto.getStatus())
-                .roles(Objects.isNull(userDto.getRoles()) ? null : userDto
-                        .getRoles()
+                .roles(Objects.isNull(userDto.getRolesDto()) ? null : userDto
+                        .getRolesDto()
                         .stream()
                         .map(RoleDto::toEntity)
                         .collect(Collectors.toList()))
-                .eventEntities(Objects.isNull(userDto.getEvents()) ? null : userDto
-                        .getEvents()
+                .eventEntities(Objects.isNull(userDto.getEventsDto()) ? null : userDto
+                        .getEventsDto()
                         .stream()
                         .map(EventDto::toEntity)
                         .collect(Collectors.toList()))
@@ -58,12 +58,12 @@ public class UserDto {
                 .lastName(userEntity.getLastName())
                 .password(userEntity.getPassword())
                 .status(userEntity.getStatus())
-                .roles(Objects.isNull(userEntity.getRoles()) ? null : userEntity
+                .rolesDto(Objects.isNull(userEntity.getRoles()) ? null : userEntity
                         .getRoles()
                         .stream()
                         .map(RoleDto::toDto)
                         .collect(Collectors.toList()))
-                .events(Objects.isNull(userEntity.getEventEntities()) ? null : userEntity
+                .eventsDto(Objects.isNull(userEntity.getEventEntities()) ? null : userEntity
                         .getEventEntities()
                         .stream()
                         .map(EventDto::toDto)

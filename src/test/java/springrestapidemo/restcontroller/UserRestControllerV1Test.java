@@ -12,6 +12,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.UserEntity;
 import springrestapidemo.service.UserService;
 
@@ -54,7 +55,7 @@ public class UserRestControllerV1Test {
 
     @Test
     public void whenFindById() throws Exception {
-        UserEntity expected = userEntity("bob@email.com");
+        UserDto expected = userEntity("bob@email.com");
 
         given(userService
                 .findById(anyLong()))
@@ -70,7 +71,7 @@ public class UserRestControllerV1Test {
 
     @Test
     public void whenFindAll() throws Exception {
-        List<UserEntity> expected = List
+        List<UserDto> expected = List
                 .of(userEntity("nick@email.com"), userEntity("bob@email.com"));
 
         given(userService
@@ -88,7 +89,7 @@ public class UserRestControllerV1Test {
 
     @Test
     public void whenSave() throws Exception {
-        UserEntity expected = userEntity("nick@email.com");
+        UserDto expected = userEntity("nick@email.com");
 
         given(userService
                 .save(any()))
@@ -107,20 +108,20 @@ public class UserRestControllerV1Test {
                 .andDo(print())
                 .andExpect(jsonPath("$.id").value(expected.getId()))
                 .andExpect(jsonPath("$.email", is(expected.getEmail())))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void whenUpdate() throws Exception {
-        UserEntity persistUser = userEntity("bob@email.com");
-        UserEntity expected = userEntity("nick@email.com");
+        UserDto persistUser = userEntity("bob@email.com");
+        UserDto expected = userEntity("nick@email.com");
 
         given(userService
-                .findById(persistUser.getId()))
+                .findById(anyLong()))
                 .willReturn(persistUser);
 
         given(userService
-                .update(persistUser))
+                .update(any(), anyLong()))
                 .willReturn(expected);
 
         mockMvc.perform(put("/api/v1/users/{id}", persistUser.getId())
@@ -141,15 +142,18 @@ public class UserRestControllerV1Test {
 
     @Test
     public void whenDelete() throws Exception {
-        UserEntity persistUser = userEntity("nick@email.com");
 
-        doNothing().when(userService).delete(persistUser);
+        doNothing().when(userService).delete(anyLong());
 
-        mockMvc.perform(delete("/api/v1/users/{id}", persistUser.getId()))
+        mockMvc.perform(delete("/api/v1/users/{id}", anyLong()))
                 .andExpect(status().isAccepted());
     }
 
-    private UserEntity userEntity(String email) {
-        return UserEntity.builder().id(1L).email(email).build();
+    private UserDto userEntity(String email) {
+        return UserDto
+                .builder()
+                .id(1L)
+                .email(email)
+                .build();
     }
 }

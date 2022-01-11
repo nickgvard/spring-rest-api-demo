@@ -48,10 +48,8 @@ public class UserService {
     }
 
     public UserDto save(UserDto userDto) {
-        return UserDto
-                .toDto(userRepository
-                        .save(UserDto
-                                .toEntity(userDto)));
+        UserEntity userEntity = UserDto.toEntity(userDto);
+        return UserDto.toDto(userRepository.save(userEntity));
     }
 
     public UserDto update(UserDto userDto, Long id) {

@@ -7,14 +7,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.UserEntity;
 import springrestapidemo.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -24,7 +27,6 @@ import static org.mockito.Mockito.verify;
  */
 
 @ExtendWith(MockitoExtension.class)
-
 public class UserServiceTest {
 
     @Mock
@@ -33,7 +35,6 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -41,22 +42,25 @@ public class UserServiceTest {
 
     @Test
     public void whenFindById() {
-        UserEntity expected = userEntity("Nick");
+        UserDto expected = userDto("Nick");
 
-        given(userRepository.findById(expected.getId())).willReturn(Optional.of(expected));
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(UserDto.toEntity(expected)));
 
-        UserEntity actual = userService.findById(expected.getId());
+        UserDto actual = userService.findById(expected.getId());
 
         assertEquals(expected.getFirstName(), actual.getFirstName());
     }
 
     @Test
     public void whenFindAll() {
-        List<UserEntity> expected = List.of(userEntity("Nick"), userEntity("Bob"));
+        List<UserDto> expected = List.of(userDto("Nick"), userDto("Bob"));
 
-        given(userRepository.findAll()).willReturn(expected);
+        given(userRepository.findAll()).willReturn(expected
+                .stream()
+                .map(UserDto::toEntity)
+                .collect(Collectors.toList()));
 
-        List<UserEntity> actual = userService.findAll();
+        List<UserDto> actual = userService.findAll();
 
         assertEquals(expected, actual);
     }
@@ -64,39 +68,53 @@ public class UserServiceTest {
     @Test
     public void whenSave() {
         UserEntity expected = userEntity("Nick");
-        UserEntity saved = UserEntity
+
+        UserDto saved = UserDto
                 .builder()
                 .id(null)
                 .firstName("Nick")
-                .eventEntities(null)
+                .eventsDto(null)
                 .build();
 
-        given(userRepository.save(saved))
-                .willReturn(expected);
+        given(userRepository.save(any())).willReturn(expected);
 
-        UserEntity actual = userService.save(saved);
+        UserDto actual = userService.save(saved);
 
-        assertEquals(expected, actual);
+        assertEquals(UserDto.toDto(expected), actual);
     }
 
     @Test
     public void whenUpdate() {
         UserEntity expected = userEntity("Nick");
-        UserEntity updated = userEntity("Nick");
 
-        given(userRepository.save(any(UserEntity.class))).willReturn(expected);
+        UserDto updated = userDto("Nick");
 
-        UserEntity actual = userService.update(updated);
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(expected));
 
-        assertEquals(expected, actual);
+        given(userRepository.save(any())).willReturn(expected);
+
+        UserDto actual = userService.update(updated, updated.getId());
+
+        assertEquals(UserDto.toDto(expected), actual);
     }
 
     @Test
     public void whenDelete() {
-        UserEntity deleted = userEntity("Bob");
-        userService.delete(deleted);
+        UserEntity deleted = UserEntity.builder().id(1L).build();
 
-        verify(userRepository).delete(deleted);
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(deleted));
+
+        userService.delete(deleted.getId());
+
+        verify(userRepository).delete(any());
+    }
+
+    private UserDto userDto(String name) {
+        return UserDto
+                .builder()
+                .id(1L)
+                .firstName(name)
+                .build();
     }
 
     private UserEntity userEntity(String name) {

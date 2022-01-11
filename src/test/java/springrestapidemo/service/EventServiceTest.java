@@ -7,6 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import springrestapidemo.dto.EventDto;
+import springrestapidemo.dto.FileDto;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.EventEntity;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.entity.UserEntity;
@@ -14,11 +17,14 @@ import springrestapidemo.repository.EventRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Nikita Gvardeev
@@ -41,25 +47,28 @@ public class EventServiceTest {
 
     @Test
     public void whenFindById() {
-        EventEntity expected = eventEntity("Description1");
+        EventDto expected = eventDto("Description1");
 
-        given(eventRepository.findById(expected.getId())).willReturn(Optional.of(expected));
+        given(eventRepository.findById(expected.getId())).willReturn(Optional.of(EventDto.toEntity(expected)));
 
-        EventEntity actual = eventService.findById(expected.getId());
+        EventDto actual = eventService.findById(expected.getId());
 
         assertEquals(expected, actual);
     }
 
     @Test
     public void whenFindAll() {
-        List<EventEntity> expected = List
+        List<EventDto> expected = List
                 .of(
-                        eventEntity("Description1"),
-                        eventEntity("Description2"));
+                        eventDto("Description1"),
+                        eventDto("Description2"));
 
-        given(eventRepository.findAll()).willReturn(expected);
+        given(eventRepository.findAll()).willReturn(expected
+                .stream()
+                .map(EventDto::toEntity)
+                .collect(Collectors.toList()));
 
-        List<EventEntity> actual = eventService.findAll();
+        List<EventDto> actual = eventService.findAll();
 
         assertEquals(expected, actual);
     }
@@ -67,35 +76,57 @@ public class EventServiceTest {
     @Test
     public void whenSave() {
         EventEntity expected = eventEntity("Description1");
-        EventEntity saved = new EventEntity(
-                null, UserEntity.builder().build(), FileEntity.builder().build(), "Description1");
 
-        given(eventRepository.save(saved))
+        EventDto saved = EventDto
+                .builder()
+                .id(null)
+                .userDto(UserDto.builder().build())
+                .fileDto(FileDto.builder().build())
+                .description("Description1")
+                .build();
+
+        given(eventRepository.save(EventDto.toEntity(saved)))
                 .willReturn(expected);
 
-        EventEntity actual = eventService.save(saved);
+        EventDto actual = eventService.save(saved);
 
-        assertEquals(expected, actual);
+        assertEquals(EventDto.toDto(expected), actual);
     }
 
     @Test
     public void whenUpdate() {
         EventEntity expected = eventEntity("Description1");
-        EventEntity updated = eventEntity("Description1");
 
-        given(eventRepository.save(any(EventEntity.class))).willReturn(expected);
+        EventDto updated = eventDto("Description1");
 
-        EventEntity actual = eventService.update(updated);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(expected));
 
-        assertEquals(expected, actual);
+        given(eventRepository.save(any())).willReturn(expected);
+
+        EventDto actual = eventService.update(updated, updated.getId());
+
+        assertEquals(EventDto.toDto(expected), actual);
     }
 
     @Test
     public void whenDelete() {
-        EventEntity deleted = eventEntity("Description2");
-        eventService.delete(deleted);
+        EventEntity deleted = EventEntity.builder().id(1L).build();
 
-        verify(eventRepository).delete(deleted);
+        when(eventRepository.findById(anyLong())).thenReturn(Optional.of(deleted));
+
+        eventService.delete(deleted.getId());
+
+        verify(eventRepository).delete(any());
+    }
+
+    private EventDto eventDto(String description) {
+        return EventDto
+                .builder()
+                .id(1L)
+                .userDto(UserDto.builder().build())
+                .fileDto(FileDto.builder().build())
+                .description(description)
+                .build();
     }
 
     private EventEntity eventEntity(String description) {

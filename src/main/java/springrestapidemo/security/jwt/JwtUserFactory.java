@@ -20,7 +20,7 @@ public final class JwtUserFactory {
                 .email(userDto.getEmail())
                 .password(userDto.getPassword())
                 .enabled(userDto.getStatus().equals(Status.ACTIVE))
-                .authorities(grantedAuthorities(new ArrayList<>(userDto.getRoles())))
+                .authorities(grantedAuthorities(new ArrayList<>(userDto.getRolesDto())))
                 .build();
     }
 

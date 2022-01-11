@@ -17,19 +17,19 @@ import java.util.Objects;
 public class EventDto {
 
     private Long id;
-    private UserDto user;
-    private FileDto file;
+    private UserDto userDto;
+    private FileDto fileDto;
     private String description;
 
     public static EventEntity toEntity(EventDto eventDto) {
         return EventEntity
                 .builder()
                 .id(eventDto.getId())
-                .userEntity(Objects.isNull(eventDto.getUser()) ? null : UserEntity
+                .userEntity(Objects.isNull(eventDto.getUserDto()) ? null : UserEntity
                         .builder()
-                        .id(eventDto.getUser().getId())
+                        .id(eventDto.getUserDto().getId())
                         .build())
-                .fileEntity(Objects.isNull(eventDto.getFile()) ? null : FileDto.toEntity(eventDto.getFile()))
+                .fileEntity(Objects.isNull(eventDto.getFileDto()) ? null : FileDto.toEntity(eventDto.getFileDto()))
                 .description(eventDto.getDescription())
                 .build();
     }
@@ -38,11 +38,11 @@ public class EventDto {
         return EventDto
                 .builder()
                 .id(eventEntity.getId())
-                .user(Objects.isNull(eventEntity.getUserEntity()) ? null : UserDto
+                .userDto(Objects.isNull(eventEntity.getUserEntity()) ? null : UserDto
                         .builder()
                         .id(eventEntity.getUserEntity().getId())
                         .build())
-                .file(Objects.isNull(eventEntity.getFileEntity()) ? null : FileDto.toDto(eventEntity.getFileEntity()))
+                .fileDto(Objects.isNull(eventEntity.getFileEntity()) ? null : FileDto.toDto(eventEntity.getFileEntity()))
                 .description(eventEntity.getDescription())
                 .build();
     }

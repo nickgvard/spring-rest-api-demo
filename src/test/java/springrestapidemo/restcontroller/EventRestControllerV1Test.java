@@ -12,6 +12,9 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import springrestapidemo.dto.EventDto;
+import springrestapidemo.dto.FileDto;
+import springrestapidemo.dto.UserDto;
 import springrestapidemo.entity.EventEntity;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.entity.UserEntity;
@@ -58,7 +61,7 @@ public class EventRestControllerV1Test {
 
     @Test
     public void whenFindById() throws Exception {
-        EventEntity expected = eventEntity("Description1");
+        EventDto expected = eventDto("Description1");
 
         given(eventService
                 .findById(anyLong()))
@@ -69,15 +72,15 @@ public class EventRestControllerV1Test {
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andExpect(jsonPath("$.id").value(expected.getId()))
-                .andExpect(jsonPath("$.user").exists())
-                .andExpect(jsonPath("$.file").exists())
+                .andExpect(jsonPath("$.userDto").exists())
+                .andExpect(jsonPath("$.fileDto").exists())
                 .andExpect(jsonPath("$.description", is(expected.getDescription())));
     }
 
     @Test
     public void whenFindAll() throws Exception {
-        List<EventEntity> expected = List
-                .of(eventEntity("Description1"), eventEntity("Description2"));
+        List<EventDto> expected = List
+                .of(eventDto("Description1"), eventDto("Description2"));
 
         given(eventService
                 .findAll())
@@ -87,17 +90,17 @@ public class EventRestControllerV1Test {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].user").exists())
-                .andExpect(jsonPath("$[0].file").exists())
+                .andExpect(jsonPath("$[0].userDto").exists())
+                .andExpect(jsonPath("$[0].fileDto").exists())
                 .andExpect(jsonPath("$[0].description", is(expected.get(0).getDescription())))
-                .andExpect(jsonPath("$[1].user").exists())
-                .andExpect(jsonPath("$[1].file").exists())
+                .andExpect(jsonPath("$[1].userDto").exists())
+                .andExpect(jsonPath("$[1].fileDto").exists())
                 .andExpect(jsonPath("$[1].description", is(expected.get(1).getDescription())));
     }
 
     @Test
     public void whenSave() throws Exception {
-        EventEntity expected = eventEntity("Description1");
+        EventDto expected = eventDto("Description1");
 
         given(eventService
                 .save(any()))
@@ -111,23 +114,23 @@ public class EventRestControllerV1Test {
                                 null, UserEntity.builder().build(), FileEntity.builder().build(), "Description1"))))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.user").exists())
-                .andExpect(jsonPath("$.file").exists())
+                .andExpect(jsonPath("$.userDto").exists())
+                .andExpect(jsonPath("$.fileDto").exists())
                 .andExpect(jsonPath("$.description", is(expected.getDescription())))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk());
     }
 
     @Test
     public void whenUpdate() throws Exception {
-        EventEntity persistFile = eventEntity("Description1");
-        EventEntity expected = eventEntity("Description1_1");
+        EventDto persistFile = eventDto("Description1");
+        EventDto expected = eventDto("Description1_1");
 
         given(eventService
-                .findById(persistFile.getId()))
+                .findById(anyLong()))
                 .willReturn(persistFile);
 
         given(eventService
-                .update(persistFile))
+                .update(any(), anyLong()))
                 .willReturn(expected);
 
         mockMvc.perform(put("/api/v1/events/{id}", persistFile.getId())
@@ -138,30 +141,29 @@ public class EventRestControllerV1Test {
                                 persistFile.getId(), UserEntity.builder().build(), FileEntity.builder().build(), "Description1"))))
                 .andDo(print())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.user").exists())
-                .andExpect(jsonPath("$.file").exists())
+                .andExpect(jsonPath("$.userDto").exists())
+                .andExpect(jsonPath("$.fileDto").exists())
                 .andExpect(jsonPath("$.description", is(expected.getDescription())))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void whenDelete() throws Exception {
-        EventEntity persistFile = eventEntity("Description1");
 
         doNothing()
                 .when(eventService)
-                .delete(persistFile);
+                .delete(anyLong());
 
-        mockMvc.perform(delete("/api/v1/events/{id}", persistFile.getId()))
+        mockMvc.perform(delete("/api/v1/events/{id}", anyLong()))
                 .andExpect(status().isAccepted());
     }
 
-    private EventEntity eventEntity(String desc) {
-        return EventEntity
+    private EventDto eventDto(String desc) {
+        return EventDto
                 .builder()
                 .id(1L)
-                .userEntity(UserEntity.builder().build())
-                .fileEntity(FileEntity.builder().build())
+                .userDto(UserDto.builder().build())
+                .fileDto(FileDto.builder().build())
                 .description(desc)
                 .build();
     }

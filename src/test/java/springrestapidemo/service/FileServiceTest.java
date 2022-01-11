@@ -7,16 +7,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
+import springrestapidemo.dto.FileDto;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.repository.FileRepository;
+import springrestapidemo.service.amazon.AmazonS3FileService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Nikita Gvardeev
@@ -29,6 +35,12 @@ public class FileServiceTest {
     @Mock
     private FileRepository fileRepository;
 
+    @Mock
+    private AmazonS3FileService s3FileService;
+
+    @Mock
+    private MultipartFile multipartFile;
+
     @InjectMocks
     private FileService fileService;
 
@@ -39,25 +51,27 @@ public class FileServiceTest {
 
     @Test
     public void whenFindById() {
-        FileEntity expected = fileEntity("File1", "Location1");
+        FileDto expected = fileDto("File1", "Location1");
 
-        given(fileRepository.findById(expected.getId())).willReturn(Optional.of(expected));
+        given(fileRepository.findById(expected.getId())).willReturn(Optional.of(FileDto.toEntity(expected)));
 
-        FileEntity actual = fileService.findById(expected.getId());
+        FileDto actual = fileService.findById(expected.getId());
 
         assertEquals(expected.getName(), actual.getName());
     }
 
     @Test
     public void whenFindAll() {
-        List<FileEntity> expected = List
+        List<FileDto> expected = List
                 .of(
-                        fileEntity("File1", "Location1"),
-                        fileEntity("File2", "Location2"));
+                        fileDto("File1", "Location1"),
+                        fileDto("File2", "Location2"));
 
-        given(fileRepository.findAll()).willReturn(expected);
+        given(fileRepository.findAll()).willReturn(expected
+                .stream()
+                .map(FileDto::toEntity).collect(Collectors.toList()));
 
-        List<FileEntity> actual = fileService.findAll();
+        List<FileDto> actual = fileService.findAll();
 
         assertEquals(expected, actual);
     }
@@ -65,34 +79,56 @@ public class FileServiceTest {
     @Test
     public void whenSave() {
         FileEntity expected = fileEntity("File1", "Location1");
-        FileEntity saved = new FileEntity(null, "File1", "Location1");
 
-        given(fileRepository.save(saved))
-                .willReturn(expected);
+        FileDto saved = FileDto
+                .builder()
+                .id(null)
+                .name("File1")
+                .location("Location1")
+                .build();
 
-        FileEntity actual = fileService.save(saved);
+        given(s3FileService.uploadFileToAmazon(any(), any())).willReturn(saved);
 
-        assertEquals(expected, actual);
+        given(fileRepository.save(any())).willReturn(expected);
+
+        FileDto actual = fileService.save(multipartFile);
+
+        assertEquals(FileDto.toDto(expected), actual);
     }
 
     @Test
     public void whenUpdate() {
         FileEntity expected = fileEntity("File1", "Location1");
-        FileEntity updated = fileEntity("File1", "Location1");
 
-        given(fileRepository.save(any(FileEntity.class))).willReturn(expected);
+        FileDto updated = fileDto("File1", "Location1");
 
-        FileEntity actual = fileService.update(updated);
+        given(fileRepository.findById(anyLong())).willReturn(Optional.of(expected));
 
-        assertEquals(expected, actual);
+        given(fileRepository.save(any())).willReturn(expected);
+
+        FileDto actual = fileService.update(updated, updated.getId());
+
+        assertEquals(FileDto.toDto(expected), actual);
     }
 
     @Test
     public void whenDelete() {
-        FileEntity deleted = fileEntity("File2", "Location2");
-        fileService.delete(deleted);
+        FileEntity deleted = FileEntity.builder().id(1L).build();
 
-        verify(fileRepository).delete(deleted);
+        when(fileRepository.findById(anyLong())).thenReturn(Optional.of(deleted));
+
+        fileService.delete(deleted.getId());
+
+        verify(fileRepository).delete(any());
+    }
+
+    private FileDto fileDto(String name, String location) {
+        return FileDto
+                .builder()
+                .id(1L)
+                .name(name)
+                .location(location)
+                .build();
     }
 
     private FileEntity fileEntity(String name, String location) {

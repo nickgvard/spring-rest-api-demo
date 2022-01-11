@@ -42,4 +42,11 @@ public class FileDto {
                 .location(fileEntity.getLocation())
                 .build();
     }
+
+    public static FileDto toDto(MultipartFile multipartFile) {
+        return FileDto
+                .builder()
+                .name(multipartFile.getOriginalFilename())
+                .build();
+    }
 }

@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import springrestapidemo.dto.FileDto;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.service.FileService;
 import springrestapidemo.service.amazon.AmazonS3FileService;
@@ -62,7 +63,7 @@ public class FileRestControllerV1Test {
 
     @Test
     public void whenFindById() throws Exception {
-        FileEntity expected = fileEntity("File1", "Location1");
+        FileDto expected = fileDto("File1", "Location1");
 
         given(fileService
                 .findById(anyLong()))
@@ -78,8 +79,8 @@ public class FileRestControllerV1Test {
 
     @Test
     public void whenFindAll() throws Exception {
-        List<FileEntity> expected = List
-                .of(fileEntity("File1", "Location1"), fileEntity("File2", "Location2"));
+        List<FileDto> expected = List
+                .of(fileDto("File1", "Location1"), fileDto("File2", "Location2"));
 
         given(fileService
                 .findAll())
@@ -97,7 +98,7 @@ public class FileRestControllerV1Test {
 
     @Test
     public void whenSave() throws Exception {
-        FileEntity expected = fileEntity("File1", "Location1");
+        FileDto expected = fileDto("File1", "Location1");
 
         given(fileService
                 .save(any()))
@@ -119,15 +120,15 @@ public class FileRestControllerV1Test {
 
     @Test
     public void whenUpdate() throws Exception {
-        FileEntity persistFile = fileEntity("File1", "Location1");
-        FileEntity expected = fileEntity("File1_1", "Location1_1");
+        FileDto persistFile = fileDto("File1", "Location1");
+        FileDto expected = fileDto("File1_1", "Location1_1");
 
         given(fileService
-                .findById(persistFile.getId()))
+                .findById(anyLong()))
                 .willReturn(persistFile);
 
         given(fileService
-                .update(persistFile))
+                .update(any(), anyLong()))
                 .willReturn(expected);
 
         mockMvc.perform(put("/api/v1/files/{id}", persistFile.getId())
@@ -145,17 +146,21 @@ public class FileRestControllerV1Test {
 
     @Test
     public void whenDelete() throws Exception {
-        FileEntity persistFile = fileEntity("File1", "Location1");
 
         doNothing()
                 .when(fileService)
-                .delete(persistFile);
+                .delete(anyLong());
 
-        mockMvc.perform(delete("/api/v1/files/{id}", persistFile.getId()))
+        mockMvc.perform(delete("/api/v1/files/{id}", anyLong()))
                 .andExpect(status().isAccepted());
     }
 
-    private FileEntity fileEntity(String name, String location) {
-        return FileEntity.builder().id(1L).name(name).location(location).build();
+    private FileDto fileDto(String name, String location) {
+        return FileDto
+                .builder()
+                .id(1L)
+                .name(name)
+                .location(location)
+                .build();
     }
 }
