@@ -1,5 +1,8 @@
 rootProject.name = 'spring-rest-api-demo'
 
+enableFeaturePreview('VERSION_CATALOGS')
+include(':app')
+
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
@@ -7,9 +10,10 @@ dependencyResolutionManagement {
             version('spring-security', '5.6.1')
             version('junit', '4.13.2')
             version('mockito', '4.0.0')
+            version('aws', '1.11.1000')
 
             alias('spring.data.jpa').to('org.springframework.boot', 'spring-boot-starter-data-jpa').versionRef('spring-boot')
-            alias('spring.security').to('org.springframework.boot', 'spring-boot-starter-security').versionRef('spring-security')
+            alias('spring.security').to('org.springframework.boot', 'spring-boot-starter-security').versionRef('spring-boot')
             alias('spring.web').to('org.springframework.boot', 'spring-boot-starter-web').versionRef('spring-boot')
 
             alias('spring.test').to('org.springframework.boot', 'spring-boot-starter-test').versionRef('spring-boot')
@@ -19,7 +23,9 @@ dependencyResolutionManagement {
             alias('mockito').to('org.mockito','mockito-core').versionRef('mockito')
 
             alias('json.web.token').to('io.jsonwebtoken:jjwt:0.9.1')
-            alias('aws.sdk').to('com.amazonaws:aws-java-sdk-bom:1.11.1000')
+
+            alias('aws.sdk.bom').to('com.amazonaws', 'aws-java-sdk-bom').versionRef('aws')
+            alias('aws.sdk').to('com.amazonaws', 'aws-java-sdk-s3').versionRef('aws')
         }
     }
 }

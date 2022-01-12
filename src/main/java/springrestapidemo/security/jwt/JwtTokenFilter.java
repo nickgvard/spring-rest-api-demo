@@ -19,7 +19,7 @@ import java.io.IOException;
  * 04.01.2022
  */
 
-@Component()
+@Component
 @RequiredArgsConstructor
 public class JwtTokenFilter extends GenericFilterBean {
 
