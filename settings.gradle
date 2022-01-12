@@ -1,1 +1,25 @@
 rootProject.name = 'spring-rest-api-demo'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            version('spring-boot', '2.6.2')
+            version('spring-security', '5.6.1')
+            version('junit', '4.13.2')
+            version('mockito', '4.0.0')
+
+            alias('spring.data.jpa').to('org.springframework.boot', 'spring-boot-starter-data-jpa').versionRef('spring-boot')
+            alias('spring.security').to('org.springframework.boot', 'spring-boot-starter-security').versionRef('spring-security')
+            alias('spring.web').to('org.springframework.boot', 'spring-boot-starter-web').versionRef('spring-boot')
+
+            alias('spring.test').to('org.springframework.boot', 'spring-boot-starter-test').versionRef('spring-boot')
+            alias('spring.security.test').to('org.springframework.security', 'spring-security-test').versionRef('spring-security')
+
+            alias('junit').to('junit', 'junit').versionRef('junit')
+            alias('mockito').to('org.mockito','mockito-core').versionRef('mockito')
+
+            alias('json.web.token').to('io.jsonwebtoken:jjwt:0.9.1')
+            alias('aws.sdk').to('com.amazonaws:aws-java-sdk-bom:1.11.1000')
+        }
+    }
+}

@@ -19,12 +19,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation libs.spring.data.jpa
+    implementation libs.spring.security
+    implementation libs.spring.web
 
     implementation 'org.flywaydb:flyway-core'
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation libs.json.web.token
 
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
     implementation 'com.amazonaws:aws-java-sdk-s3'
@@ -36,8 +36,8 @@ dependencies {
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.6.2'
-    testImplementation group: 'org.springframework.security', name: 'spring-security-test', version: '5.6.1'
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '4.0.0'
+    testImplementation libs.spring.test
+    testImplementation libs.spring.security.test
+    testImplementation libs.junit
+    testImplementation libs.mockito
 }
