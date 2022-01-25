@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import springrestapidemo.dto.FileDto;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.service.FileService;
-import springrestapidemo.service.amazon.AmazonS3FileService;
+import springrestapidemo.service.AmazonS3FileService;
 
 import java.util.List;
 

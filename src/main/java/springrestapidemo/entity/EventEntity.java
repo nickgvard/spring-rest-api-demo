@@ -1,8 +1,7 @@
 package springrestapidemo.entity;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
+
 import javax.persistence.*;
 
 /**
@@ -17,9 +16,6 @@ import javax.persistence.*;
 @Data
 @ToString
 @Builder
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 public class EventEntity {
 
     @Id

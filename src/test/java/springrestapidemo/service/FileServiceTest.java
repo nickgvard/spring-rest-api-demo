@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 import springrestapidemo.dto.FileDto;
 import springrestapidemo.entity.FileEntity;
 import springrestapidemo.repository.FileRepository;
-import springrestapidemo.service.amazon.AmazonS3FileService;
 
 import java.util.List;
 import java.util.Optional;

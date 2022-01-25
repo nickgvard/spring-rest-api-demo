@@ -19,12 +19,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class AmazonConfig {
 
-    @Value("${amazon.s3.endpoint}")
-    private String url;
-
-    @Value("${amazon.s3.bucket-name}")
-    private String bucketName;
-
     @Value("${amazon.s3.access-key}")
     private String accessKey;
 
