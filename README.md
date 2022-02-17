@@ -14,4 +14,4 @@
 + Mockito
 + Docker
 + Travis
-+ AWS SDK
++ AWS SDK (S3, EC2)
