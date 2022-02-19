@@ -1,7 +1,5 @@
 
-### Demo of a simple RESTful application with Spring
->
-> MVC Pattern
+### REST API that interacts with AWS S3 file storage and provides access to files and download history.
 
 ### Technology stack:
 + Java
